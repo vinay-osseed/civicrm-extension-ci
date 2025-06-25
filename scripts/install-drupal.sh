@@ -8,6 +8,11 @@ CMS_VERSION="10.5.0"  # or latest
 
 # Install composer project
 composer create-project drupal/recommended-project $CMS_DIR "^$CMS_VERSION"
+
+# Adjust permissions
+cd $CMS_DIR
+
+# Set up Composer to allow necessary plugins
 composer config --no-plugins allow-plugins.'composer/installers' true \
   allow-plugins.'civicrm/composer-compile-plugin' true \
   allow-plugins.'civicrm/composer-downloads-plugin' true \
@@ -17,9 +22,6 @@ composer config --no-plugins allow-plugins.'composer/installers' true \
   allow-plugins.'drupal/core-project-message' true \
   allow-plugins.'zaporylie/composer-drupal-optimizations' true
 
-
-# Adjust permissions
-cd $CMS_DIR
 mkdir -p web/sites/default/files
 chmod -R 755 web/sites/default
 cp web/sites/default/default.settings.php web/sites/default/settings.php
