@@ -1,4 +1,4 @@
-name: Test Extension on CMS + CiviCRM
+name: Test Extension on LAMP with CiviCRM
 
 on:
   workflow_dispatch:
@@ -8,59 +8,63 @@ on:
     branches: [ main ]
 
 jobs:
-  civi-test:
+  test-lamp:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        cms: [drupal, wordpress]
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: civicrm
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd "mysqladmin ping --silent"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    env:
+      CMS_TYPE: drupal # or wordpress
+      DB_NAME: civicrm
+      DB_USER: root
+      DB_PASS: root
+      DB_HOST: 127.0.0.1
+      WEB_ROOT: /var/www/html
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout extension repo
+      uses: actions/checkout@v4
 
-    - name: Make scripts executable
-      run: chmod +x scripts/*.sh
+    - name: Install LAMP Stack
+      run: |
+        sudo apt update
+        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl libapache2-mod-php unzip curl wget git
 
-    - name: Install PHP & Composer
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.1'
-        tools: composer
+        sudo service apache2 start
+        sudo service mysql start
 
-    - name: Set NGROK_AUTH_TOKEN
+    - name: Create DB
+      run: |
+        mysql -uroot -proot -e "CREATE DATABASE civicrm DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+
+    - name: Install Composer
+      run: |
+        curl -sS https://getcomposer.org/installer | php
+        sudo mv composer.phar /usr/local/bin/composer
+
+    - name: Install CMS (${{ env.CMS_TYPE }})
+      run: |
+        bash scripts/install-${{ env.CMS_TYPE }}.sh
+
+    - name: Install CiviCRM
+      run: |
+        bash scripts/install-civicrm.sh ${{ env.CMS_TYPE }}
+
+    - name: Copy extension into CMS
+      run: |
+        bash scripts/link-extension.sh ${{ github.workspace }}
+
+    - name: Install ngrok
+      run: |
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+        sudo apt update && sudo apt install ngrok
+
+    - name: Configure ngrok
       run: ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
 
-    - name: Install CMS and CiviCRM
+    - name: Expose site with ngrok
       run: |
-        ./scripts/install-${{ matrix.cms }}.sh
-        ./scripts/install-civicrm.sh ${{ matrix.cms }}
-
-    - name: Install your extension
-      run: |
-        mkdir -p ./web/${{ matrix.cms }}/sites/all/modules/civicrm/ext
-        cd ./web/${{ matrix.cms }}/sites/all/modules/civicrm/ext
-        git clone https://${{ secrets.EXTENSION_REPO_PAT }}@github.com/osseed/com.osseed.eventcalendar.git
-
-    - name: Expose with ngrok
-      run: |
-        ./scripts/expose-via-ngrok.sh
-
-    # - name: Show live URL
-    #   run: |
-    #     echo "✅ CMS: ${{ matrix.cms }} running at $NGROK_URL"
-
-    - name: Keep alive for manual testing (5 minutes)
-      run: sleep 300
+        ngrok http 80 > ngrok.log &
+        sleep 5
+        cat ngrok.log
+        NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r .tunnels[0].public_url)
+        echo "🔗 ${{ env.CMS_TYPE }} is live at $NGROK_URL"
