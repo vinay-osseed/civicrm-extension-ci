@@ -23,17 +23,18 @@ jobs:
     - name: Checkout extension repo
       uses: actions/checkout@v4
 
-    - name: Install LAMP stack & dependencies
+    - name: Install LAMP Stack
       run: |
         sudo apt update
-        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl php-intl php-mbstring php-zip php-bcmath libapache2-mod-php unzip curl wget git jq
-
+        sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
+        sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
+        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl libapache2-mod-php unzip curl wget git
         sudo service apache2 start
         sudo service mysql start
 
-    - name: Create CiviCRM DB
+    - name: Create DB
       run: |
-        sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS civicrm DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+        sudo mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS civicrm DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
 
     - name: Install Composer
       run: |
