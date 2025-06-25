@@ -12,15 +12,23 @@ composer create-project drupal/recommended-project $CMS_DIR "^$CMS_VERSION"
 # Adjust permissions
 cd $CMS_DIR
 
-# Set up Composer to allow necessary plugins
-composer config --no-plugins allow-plugins.'composer/installers' true \
-  allow-plugins.'civicrm/composer-compile-plugin' true \
-  allow-plugins.'civicrm/composer-downloads-plugin' true \
-  allow-plugins.'cweagans/composer-patches' true \
-  allow-plugins.'civicrm/civicrm-asset-plugin' true \
-  allow-plugins.'drupal/core-composer-scaffold' true \
-  allow-plugins.'drupal/core-project-message' true \
-  allow-plugins.'zaporylie/composer-drupal-optimizations' true
+# ✅ Allow all required Composer plugins globally
+composer config --no-plugins allow-plugins \
+  "composer/installers" true \
+  "civicrm/composer-compile-plugin" true \
+  "civicrm/composer-downloads-plugin" true \
+  "cweagans/composer-patches" true \
+  "civicrm/civicrm-asset-plugin" true \
+  "drupal/core-composer-scaffold" true \
+  "drupal/core-project-message" true \
+  "zaporylie/composer-drupal-optimizations" true
+
+# 🛠️ Enable patching and Drupal scaffolding behavior
+composer config extra.enable-patching true
+composer config extra.drupal-scaffold-destination "web"
+composer config extra.drupal-scaffold-allow-empty true
+composer config extra.drupal-scaffold-allow-unsafe true
+
 
 mkdir -p web/sites/default/files
 chmod -R 755 web/sites/default
