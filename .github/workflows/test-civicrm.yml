@@ -23,17 +23,17 @@ jobs:
     - name: Checkout extension repo
       uses: actions/checkout@v4
 
-    - name: Install LAMP Stack
+    - name: Install LAMP stack & dependencies
       run: |
         sudo apt update
-        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl libapache2-mod-php unzip curl wget git
+        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl php-intl php-mbstring php-zip php-bcmath libapache2-mod-php unzip curl wget git jq
 
         sudo service apache2 start
         sudo service mysql start
 
-    - name: Create DB
+    - name: Create CiviCRM DB
       run: |
-        mysql -uroot -proot -e "CREATE DATABASE civicrm DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+        sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS civicrm DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
 
     - name: Install Composer
       run: |
@@ -48,7 +48,7 @@ jobs:
       run: |
         bash scripts/install-civicrm.sh ${{ env.CMS_TYPE }}
 
-    - name: Copy extension into CMS
+    - name: Link extension into CMS
       run: |
         bash scripts/link-extension.sh ${{ github.workspace }}
 
@@ -56,15 +56,14 @@ jobs:
       run: |
         curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
         echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-        sudo apt update && sudo apt install ngrok
+        sudo apt update && sudo apt install -y ngrok
 
     - name: Configure ngrok
       run: ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
 
-    - name: Expose site with ngrok
+    - name: Expose site with ngrok and show URL
       run: |
         ngrok http 80 > ngrok.log &
-        sleep 5
-        cat ngrok.log
-        NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r .tunnels[0].public_url)
-        echo "🔗 ${{ env.CMS_TYPE }} is live at $NGROK_URL"
+        sleep 8
+        NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
+        echo "✅ CMS: ${{ env.CMS_TYPE }} running at $NGROK_URL"
