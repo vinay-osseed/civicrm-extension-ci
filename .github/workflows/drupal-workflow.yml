@@ -41,10 +41,17 @@ jobs:
       run: |
         curl -sS https://getcomposer.org/installer | php
         sudo mv composer.phar /usr/local/bin/composer
-
-    - name: Allow composer patches plugin
+    
+    - name: Globally allow composer patches plugin
       run: |
-        composer config --no-plugins allow-plugins.cweagans/composer-patches true
+        mkdir -p $HOME/.config/composer
+        echo '{
+          "config": {
+            "allow-plugins": {
+              "cweagans/composer-patches": true
+            }
+          }
+        }' > $HOME/.config/composer/composer.json
 
     - name: Install CMS (${{ env.CMS_TYPE }})
       run: |
