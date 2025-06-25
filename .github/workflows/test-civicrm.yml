@@ -1,0 +1,65 @@
+name: Test Extension on CMS + CiviCRM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  civi-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cms: [drupal, wordpress]
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: civicrm
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping --silent"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Make scripts executable
+      run: chmod +x scripts/*.sh
+
+    - name: Install PHP & Composer
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        tools: composer
+
+    - name: Set NGROK_AUTH_TOKEN
+      run: ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+
+    - name: Install CMS and CiviCRM
+      run: |
+        ./scripts/install-${{ matrix.cms }}.sh
+        ./scripts/install-civicrm.sh ${{ matrix.cms }}
+
+    - name: Install your extension
+      run: |
+        mkdir -p ./web/${{ matrix.cms }}/sites/all/modules/civicrm/ext
+        cd ./web/${{ matrix.cms }}/sites/all/modules/civicrm/ext
+        git clone https://${{ secrets.EXTENSION_REPO_PAT }}@github.com/osseed/com.osseed.eventcalendar.git
+
+    - name: Expose with ngrok
+      run: |
+        ./scripts/expose-via-ngrok.sh
+
+    - name: Show live URL
+      run: echo "✅ CMS: ${{ matrix.cms }} running at $NGROK_URL"
+
+    - name: Keep alive for manual testing (5 minutes)
+      run: sleep 300
