@@ -30,7 +30,14 @@ composer config extra.drupal-scaffold-destination "web"
 composer config extra.drupal-scaffold-allow-empty true
 composer config extra.drupal-scaffold-allow-unsafe true
 
+# Set compile plugin config to avoid prompts
+composer config extra.compile-mode whitelist
+composer config extra.compile-whitelist.0 civicrm/civicrm-core
+composer config extra.compile-whitelist.1 civicrm/composer-compile-lib
+
+
 # 📦 Install CiviCRM and CLI tools
+export COMPOSER_COMPILE=0
 composer require civicrm/civicrm-core civicrm/civicrm-packages civicrm/civicrm-drupal-8
 composer require civicrm/cli-tools
 
