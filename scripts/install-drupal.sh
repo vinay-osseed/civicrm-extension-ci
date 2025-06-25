@@ -8,6 +8,7 @@ CMS_VERSION="10.5.0"  # or latest
 
 # Install composer project
 composer create-project drupal/recommended-project $CMS_DIR "^$CMS_VERSION"
+composer config --no-plugins allow-plugins.cweagans/composer-patches true
 
 # Adjust permissions
 cd $CMS_DIR
