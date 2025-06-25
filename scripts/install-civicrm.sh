@@ -14,6 +14,8 @@ fi
 
 cd "$CMS_DIR"
 
+composer config --no-plugins allow-plugins.cweagans/composer-patches true
+
 # Enable patching via composer.json
 composer config extra.enable-patching true
 
