@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CMS_TYPE: drupal # or wordpress
+      CMS_TYPE: drupal # change to "wordpress" to test WordPress instead
       DB_NAME: civicrm
       DB_USER: root
       DB_PASS: root
@@ -28,18 +28,23 @@ jobs:
         sudo apt update
         sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
         sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
-        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl libapache2-mod-php unzip curl wget git
+        sudo apt install -y apache2 mysql-server php php-mysql php-cli php-xml php-gd php-curl php-intl php-zip php-mbstring libapache2-mod-php unzip curl wget git jq
+
         sudo service apache2 start
         sudo service mysql start
 
-    - name: Create DB
+    - name: Create MySQL Database
       run: |
-        sudo mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS civicrm DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+        sudo mysql -u${{ env.DB_USER }} -p${{ env.DB_PASS }} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
 
     - name: Install Composer
       run: |
         curl -sS https://getcomposer.org/installer | php
         sudo mv composer.phar /usr/local/bin/composer
+
+    - name: Allow composer patches plugin
+      run: |
+        composer config --no-plugins allow-plugins.cweagans/composer-patches true
 
     - name: Install CMS (${{ env.CMS_TYPE }})
       run: |
@@ -66,5 +71,5 @@ jobs:
       run: |
         ngrok http 80 > ngrok.log &
         sleep 8
-        NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
+        export NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
         echo "✅ CMS: ${{ env.CMS_TYPE }} running at $NGROK_URL"
