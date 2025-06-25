@@ -8,7 +8,15 @@ CMS_VERSION="10.5.0"  # or latest
 
 # Install composer project
 composer create-project drupal/recommended-project $CMS_DIR "^$CMS_VERSION"
-composer config --no-plugins allow-plugins.cweagans/composer-patches true
+composer config --no-plugins allow-plugins.'composer/installers' true \
+  allow-plugins.'civicrm/composer-compile-plugin' true \
+  allow-plugins.'civicrm/composer-downloads-plugin' true \
+  allow-plugins.'cweagans/composer-patches' true \
+  allow-plugins.'civicrm/civicrm-asset-plugin' true \
+  allow-plugins.'drupal/core-composer-scaffold' true \
+  allow-plugins.'drupal/core-project-message' true \
+  allow-plugins.'zaporylie/composer-drupal-optimizations' true
+
 
 # Adjust permissions
 cd $CMS_DIR
