@@ -59,7 +59,7 @@ jobs:
         ./scripts/expose-via-ngrok.sh
 
     - name: Show live URL
-      run: 
+      run: |
         echo "✅ CMS: ${{ matrix.cms }} running at $NGROK_URL"
 
     - name: Keep alive for manual testing (5 minutes)
