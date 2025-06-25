@@ -14,28 +14,24 @@ fi
 
 cd "$CMS_DIR"
 
+# ✅ Allow required Composer plugins
+composer config --no-plugins allow-plugins.composer/installers true
+composer config --no-plugins allow-plugins.civicrm/composer-compile-plugin true
+composer config --no-plugins allow-plugins.civicrm/composer-downloads-plugin true
+composer config --no-plugins allow-plugins.cweagans/composer-patches true
+composer config --no-plugins allow-plugins.civicrm/civicrm-asset-plugin true
+composer config --no-plugins allow-plugins.drupal/core-composer-scaffold true
+composer config --no-plugins allow-plugins.drupal/core-project-message true
+composer config --no-plugins allow-plugins.zaporylie/composer-drupal-optimizations true
 
-# ✅ Allow all required Composer plugins globally
-composer config --no-plugins allow-plugins \
-  "composer/installers" true \
-  "civicrm/composer-compile-plugin" true \
-  "civicrm/composer-downloads-plugin" true \
-  "cweagans/composer-patches" true \
-  "civicrm/civicrm-asset-plugin" true \
-  "drupal/core-composer-scaffold" true \
-  "drupal/core-project-message" true \
-  "zaporylie/composer-drupal-optimizations" true
-
-# 🛠️ Enable patching and Drupal scaffolding behavior
+# 🛠️ Enable patching and scaffold settings
 composer config extra.enable-patching true
 composer config extra.drupal-scaffold-destination "web"
 composer config extra.drupal-scaffold-allow-empty true
 composer config extra.drupal-scaffold-allow-unsafe true
 
-# Require CiviCRM packages (core, packages, drupal integration)
+# 📦 Install CiviCRM and CLI tools
 composer require civicrm/civicrm-core civicrm/civicrm-packages civicrm/civicrm-drupal-8
-
-# Optional: install CLI tools for useful commands like `civix` or `cv`
 composer require civicrm/cli-tools
 
-echo "✅ CiviCRM packages installed into $CMS_DIR/"
+echo "✅ CiviCRM installed successfully in $CMS_DIR/"
