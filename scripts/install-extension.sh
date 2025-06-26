@@ -1,10 +1,22 @@
 #!/bin/bash
 set -e
-git clone https://github.com/${EXT_REPO}.git ext
-# Copy it to the CMS extension dir
-if [ -d web ]; then
-  cp -r ext /var/www/html/web/modules/contrib/eventcalendar
-elif [ -d wp ]; then
-  cp -r ext /var/www/html/wp/wp-content/plugins/eventcalendar
+
+CMS=$1
+CMS_DIR="$CMS"
+
+echo "🚀 Installing CiviCRM into $CMS..."
+
+# Make sure the Drupal directory exists
+if [ ! -d "$CMS_DIR" ]; then
+  echo "❌ Directory $CMS_DIR does not exist"
+  exit 1
 fi
-# Run install commands: drush or WP-CLI to enable
+
+# Change to the CMS directory
+cd "$CMS_DIR"
+EXT_DIR=$(cv ev 'echo \Civi::paths()->getPath("[civicrm.files]/ext", TRUE);')
+echo "📂 CiviCRM extension dir is: $EXT_DIR"
+cd "$EXT_DIR"
+
+# Clone the CiviCRM Event Calendar extension  
+git clone git@github.com:vinugawade/com.osseed.eventcalendar.git com.osseed.eventcalendar

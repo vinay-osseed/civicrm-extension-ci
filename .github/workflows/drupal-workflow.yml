@@ -63,7 +63,7 @@ jobs:
 
     - name: Link extension into CMS
       run: |
-        bash scripts/link-extension.sh ${{ github.workspace }}
+        bash scripts/link-extension.sh ${{ env.CMS_TYPE }}
 
     - name: Install ngrok
       run: |
