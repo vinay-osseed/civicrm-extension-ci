@@ -42,12 +42,17 @@ composer require civicrm/civicrm-core civicrm/civicrm-packages civicrm/civicrm-d
 # 6. Optional but useful: install CLI tools like `cv`
 composer require civicrm/cli-tools
 
-# 7. Enable CiviCRM module in Drupal (skip if already enabled)
-./vendor/bin/drush en -y civicrm
+# 7. Fix permissions to allow CiviCRM to create settings
+chmod -R u+w web/sites/default
+mkdir -p web/sites/default/files/civicrm
+chmod -R u+w web/sites/default/files/civicrm
 
-# 8. Install CiviCRM using `cv` if available
-if command -v ./vendor/bin/cv >/dev/null 2>&1; then
+# 8. Enable the CiviCRM module
+./vendor/bin/drush -l http://localhost en -y civicrm
+
+# 9. Install CiviCRM using `cv` if available
+if [ -x ./vendor/bin/cv ]; then
   ./vendor/bin/cv core:install -m loadGenerated -L
 fi
 
-echo "✅ CiviCRM installed and enabled into $CMS_DIR/"
+echo "✅ CiviCRM installed and enabled in $CMS_DIR/"
