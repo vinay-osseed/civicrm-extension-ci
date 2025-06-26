@@ -14,7 +14,8 @@ fi
 
 # Change to the CMS directory
 cd "$CMS_DIR"
-EXT_DIR=$(cv ev 'echo \Civi::paths()->getPath("[civicrm.files]/ext", TRUE);')
+ls .
+EXT_DIR=$(./vendor/bin/cv ev 'echo \Civi::paths()->getPath("[civicrm.files]/ext", TRUE);')
 echo "📂 CiviCRM extension dir is: $EXT_DIR"
 cd "$EXT_DIR"
 
