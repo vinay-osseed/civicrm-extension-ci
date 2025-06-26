@@ -44,4 +44,7 @@ composer require civicrm/civicrm-core civicrm/civicrm-packages civicrm/civicrm-d
 # Optional CLI tools
 composer require civicrm/cli-tools
 
+# Enable useful modules
+./vendor/bin/drush en -y civicrm
+
 echo "✅ CiviCRM installed into $CMS_DIR/"
