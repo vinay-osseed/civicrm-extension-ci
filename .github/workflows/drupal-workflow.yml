@@ -61,9 +61,9 @@ jobs:
       run: |
         bash scripts/install-civicrm.sh ${{ env.CMS_TYPE }}
 
-    - name: Link extension into CMS
+    - name: Get extension into CMS
       run: |
-        bash scripts/link-extension.sh ${{ env.CMS_TYPE }}
+        bash scripts/install-extension.sh ${{ env.CMS_TYPE }}
 
     - name: Install ngrok
       run: |
