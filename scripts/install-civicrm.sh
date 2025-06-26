@@ -52,15 +52,14 @@ chmod -R u+w web/sites/default/files/civicrm
 
 # 9. Install CiviCRM using `cv`
 if [ -x ./vendor/bin/cv ]; then
-  export CV_SITE_URL="http://localhost"
-  export CV_UF_BASEURL="http://localhost"
-  
   ./vendor/bin/cv core:install \
     --db="mysql://root:root@127.0.0.1/d10" \
+    --cms-base-url="http://localhost" \
     --lang="en_US" \
     --comp="CiviContribute,CiviEvent,CiviMember,CiviMail,CiviReport" \
     --force \
-    --no-interaction
+    --no-interaction \
+    -vvv
 fi
 
 echo "✅ CiviCRM installed and enabled in $CMS_DIR"
