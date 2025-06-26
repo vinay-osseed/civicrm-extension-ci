@@ -48,4 +48,4 @@ composer require drush/drush drupal/admin_toolbar
 # Enable useful modules
 ./vendor/bin/drush en -y admin_toolbar
 
-echo "✅ Drupal installed in $CMS_DIR/ using SQLite and configured."
+echo "✅ Drupal installed in $CMS_DIR/ using MySQL and configured."

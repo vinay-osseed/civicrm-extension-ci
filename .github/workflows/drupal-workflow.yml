@@ -53,7 +53,7 @@ jobs:
           }
         }' > $HOME/.config/composer/composer.json
 
-    - name: Install CMS (${{ env.CMS_TYPE }})
+    - name: Install CMS Drupal
       run: |
         bash scripts/install-${{ env.CMS_TYPE }}.sh
 
