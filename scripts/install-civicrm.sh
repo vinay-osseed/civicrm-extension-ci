@@ -50,9 +50,15 @@ chmod -R u+w web/sites/default/files/civicrm
 # 8. Enable the CiviCRM module
 ./vendor/bin/drush -l http://localhost en -y civicrm
 
-# 9. Install CiviCRM using `cv` if available
+# 9. Install CiviCRM using `cv`
 if [ -x ./vendor/bin/cv ]; then
-  ./vendor/bin/cv core:install -m loadGenerated -L
+  ./vendor/bin/cv core:install \
+    --cms-base-url="http://localhost" \
+    --db="mysql://root:root@127.0.0.1/civicrm" \
+    --lang="en_US" \
+    --comp="CiviContribute,CiviEvent,CiviMember,CiviMail,CiviReport" \
+    --force \
+    --no-interaction
 fi
 
 echo "✅ CiviCRM installed and enabled in $CMS_DIR/"
