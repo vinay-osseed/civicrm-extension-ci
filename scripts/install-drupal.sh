@@ -19,7 +19,8 @@ cd "$CMS_DIR"
 
 # Adjust file permissions
 mkdir -p web/sites/default/files
-chmod -R 755 web/sites/default
+chmod -R 777 web/sites/default
+chmod -R 777 web/sites/default/files
 cp web/sites/default/default.settings.php web/sites/default/settings.php
 
 # Use MySQL instead
