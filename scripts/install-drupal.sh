@@ -22,10 +22,15 @@ mkdir -p web/sites/default/files
 chmod -R 755 web/sites/default
 cp web/sites/default/default.settings.php web/sites/default/settings.php
 
-# Configure SQLite DB
+# Use MySQL instead
 echo "\$databases['default']['default'] = [
-  'driver' => 'sqlite',
-  'database' => '/tmp/site.sqlite',
+  'driver' => 'mysql',
+  'database' => 'd10',
+  'username' => 'root',
+  'password' => 'root',
+  'host' => '127.0.0.1',
+  'port' => '3306',
+  'prefix' => '',
 ];" >> web/sites/default/settings.php
 
 # Install Drush

@@ -13,7 +13,7 @@ jobs:
 
     env:
       CMS_TYPE: drupal # change to "wordpress" to test WordPress instead
-      DB_NAME: civicrm
+      DB_NAME: d10
       DB_USER: root
       DB_PASS: root
       DB_HOST: 127.0.0.1
